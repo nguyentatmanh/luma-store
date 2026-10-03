@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#6457db">
+  <title>Luma Store — Quản lý cửa hàng</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Đi đến nội dung</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview"><img src="/assets/logo.svg" alt="" width="38" height="38"><span>Luma<span class="brand-light"> Store</span><small>Gọn gàng. Dễ quản lý.</small></span></a>
+      <div class="workspace"><span class="workspace-avatar">L</span><div><strong>Cửa hàng Luma</strong><small>Không gian quản lý</small></div><span class="workspace-dot" title="Ứng dụng nội bộ"></span></div>
+      <span class="nav-caption">KHÔNG GIAN LÀM VIỆC</span>
+      <nav aria-label="Điều hướng chính">
+        <a href="#overview" data-nav="overview"><span data-icon="overview"></span>Tổng quan</a>
+        <a href="#products" data-nav="products"><span data-icon="box"></span>Sản phẩm</a>
+        <a href="#inventory" data-nav="inventory"><span data-icon="layers"></span>Kho hàng</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><span data-icon="sparkle"></span><strong>Một cửa hàng, một nơi quản lý.</strong><p>Thông tin sản phẩm và tồn kho luôn đi cùng nhau.</p></div>
+        <a class="demo-link" href="/demo.html"><span data-icon="server"></span>Trình diễn NGINX<span data-icon="external"></span></a>
+        <div class="store-account"><span class="avatar">LS</span><div><strong>Luma Store</strong><small>Cửa hàng mẫu · VND</small></div></div>
+      </div>
+    </aside>
+    <div class="content-shell">
+      <header class="topbar"><div class="breadcrumb">Cửa hàng Luma <span>/</span> <strong id="breadcrumb-current">Tổng quan</strong></div><div class="topbar-right"><span class="sample-tag"><span></span>Dữ liệu thực hành</span><span class="avatar avatar-small">LS</span></div></header>
+      <main id="main" tabindex="-1"><div id="view"></div><footer class="page-footer"><span>Luma Store · Quản lý sản phẩm & kho hàng</span><span>Đơn giản để bắt đầu.</span></footer></main>
+    </div>
+  </div>
+
+  <dialog id="product-dialog" class="dialog dialog-wide" aria-labelledby="product-dialog-title">
+    <form id="product-form" novalidate>
+      <div class="dialog-head"><div><span class="eyebrow">THÔNG TIN SẢN PHẨM</span><h2 id="product-dialog-title">Thêm sản phẩm</h2></div><button type="button" class="icon-button" data-close aria-label="Đóng"><span data-icon="close"></span></button></div>
+      <div class="dialog-body">
+        <p class="form-alert hidden" role="alert" id="product-error"></p>
+        <div class="image-picker"><img id="product-preview" src="/assets/products/box.svg" alt="Ảnh sản phẩm"><div><strong>Ảnh sản phẩm</strong><p>JPEG, PNG hoặc WebP · tối đa 8 MB</p><label class="button button-secondary button-small" for="product-image"><span data-icon="upload"></span>Chọn ảnh</label><input id="product-image" type="file" accept="image/jpeg,image/png,image/webp" class="visually-hidden"><small id="product-image-name">Ảnh minh họa mặc định</small></div></div>
+        <div class="form-grid">
+          <div class="field field-full"><label for="product-name">Tên sản phẩm <span>*</span></label><input id="product-name" name="name" maxlength="160" required placeholder="Ví dụ: Bàn phím không dây"><small data-error-for="name"></small></div>
+          <div class="field"><label for="product-sku">Mã SKU <span>*</span></label><input id="product-sku" name="sku" maxlength="32" required placeholder="LM-KB02"><small data-error-for="sku"></small></div>
+          <div class="field"><label for="product-category">Danh mục <span>*</span></label><select id="product-category" name="categoryId" required></select><small data-error-for="categoryId"></small></div>
+          <div class="field"><label for="product-price">Giá bán (đ) <span>*</span></label><input id="product-price" name="price" type="number" min="0" max="1000000000" step="1" required placeholder="0"><small data-error-for="price"></small></div>
+          <div class="field"><label for="product-threshold">Cảnh báo khi tồn ≤</label><input id="product-threshold" name="lowStockAt" type="number" min="0" max="1000000" step="1" value="5" required><small data-error-for="lowStockAt"></small></div>
+          <div class="field" id="opening-stock-field"><label for="product-stock">Tồn đầu kỳ</label><input id="product-stock" name="stock" type="number" min="0" max="1000000" step="1" value="0" required><small data-error-for="stock"></small></div>
+          <div class="field"><label for="product-active">Trạng thái</label><select id="product-active" name="isActive"><option value="true">Đang kinh doanh</option><option value="false">Ngừng kinh doanh</option></select><small data-error-for="isActive"></small></div>
+          <div class="field field-full"><label for="product-description">Mô tả</label><textarea id="product-description" name="description" maxlength="1000" rows="3" placeholder="Đặc điểm, chất liệu hoặc thông tin cần lưu ý…"></textarea><small data-error-for="description"></small></div>
+        </div>
+        <p id="edit-stock-note" class="hint hidden"><span data-icon="info"></span>Tồn kho được cập nhật qua phiếu nhập/xuất để giữ lại lịch sử.</p>
+      </div>
+      <div class="dialog-footer"><button type="button" class="button button-secondary" data-close>Hủy</button><button type="submit" class="button button-primary" id="product-submit">Thêm sản phẩm</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="stock-dialog" class="dialog" aria-labelledby="stock-dialog-title">
+    <form id="stock-form" novalidate>
+      <div class="dialog-head"><div><span class="eyebrow">CẬP NHẬT TỒN KHO</span><h2 id="stock-dialog-title">Tạo phiếu kho</h2></div><button type="button" class="icon-button" data-close aria-label="Đóng"><span data-icon="close"></span></button></div>
+      <div class="dialog-body">
+        <p class="form-alert hidden" role="alert" id="stock-error"></p>
+        <div class="stock-product" id="stock-product"></div>
+        <div class="field"><label for="movement-kind">Loại phiếu</label><select id="movement-kind" name="kind"><option value="in">Nhập kho — tăng số lượng</option><option value="out">Xuất kho — giảm số lượng</option></select></div>
+        <div class="field"><label for="movement-quantity">Số lượng <span>*</span></label><input id="movement-quantity" name="quantity" type="number" min="1" max="1000000" step="1" required placeholder="Nhập số lượng"><small data-error-for="quantity"></small></div>
+        <p class="stock-calculation" id="stock-calculation"></p>
+        <div class="field"><label for="movement-note">Ghi chú</label><textarea id="movement-note" name="note" maxlength="300" rows="3" placeholder="Ví dụ: Nhập hàng từ nhà cung cấp"></textarea><small data-error-for="note"></small></div>
+      </div>
+      <div class="dialog-footer"><button type="button" class="button button-secondary" data-close>Hủy</button><button type="submit" class="button button-primary" id="stock-submit">Lưu phiếu kho</button></div>
+    </form>
+  </dialog>
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
