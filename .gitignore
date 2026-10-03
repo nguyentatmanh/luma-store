@@ -1,0 +1,8 @@
+.env
+backend/node_modules/
+certs/*.key
+certs/*.crt
+demo-files/*.bin
+*.log
+.https-enabled
+nginx/.previous.conf
