@@ -1,0 +1,20 @@
+{
+  "name": "luma-store-api",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Small product and inventory management system",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node ../scripts/check.mjs"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "mysql2": "3.24.5",
+    "multer": "2.2.0",
+    "sharp": "0.35.5"
+  }
+}
