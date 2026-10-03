@@ -1,0 +1,89 @@
+name: luma-store-demo
+x-backend: &backend
+  image: luma-store-api:2.0
+  build:
+    context: ./backend
+  environment: &backend-env
+    PORT: 8080
+    MYSQL_HOST: mysql
+    MYSQL_PORT: 3306
+    MYSQL_DATABASE: $MYSQL_DATABASE
+    MYSQL_USER: $MYSQL_USER
+    MYSQL_PASSWORD: $MYSQL_PASSWORD
+    UPLOAD_DIR: /app/uploads
+  volumes:
+    - uploads:/app/uploads
+  depends_on:
+    mysql:
+      condition: service_healthy
+  networks:
+    - demo
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 10s
+    timeout: 5s
+    start_period: 30s
+    retries: 10
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - demo
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u \"$$MYSQL_USER\" \"$$MYSQL_DATABASE\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 30
+
+  backend1:
+    <<: *backend
+    environment:
+      <<: *backend-env
+      SERVER_ID: BACKEND-01
+    ports:
+      - "127.0.0.1:$BACKEND1_PORT:8080"
+
+  backend2:
+    <<: *backend
+    environment:
+      <<: *backend-env
+      SERVER_ID: BACKEND-02
+    ports:
+      - "127.0.0.1:$BACKEND2_PORT:8080"
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "$HTTP_PORT:80"
+    volumes:
+      - ./nginx:/etc/nginx:ro
+      - ./frontend:/usr/share/nginx/html:ro
+      - uploads:/srv/media:ro
+    depends_on:
+      backend1:
+        condition: service_healthy
+      backend2:
+        condition: service_healthy
+    networks:
+      - demo
+    restart: unless-stopped
+
+networks:
+  demo:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  uploads:
