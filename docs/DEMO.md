@@ -134,3 +134,8 @@ Lệnh này trở về stage 4, giữ dữ liệu đã tạo.
 | 20M có cho phép ảnh 20 MB không? | 20M là giới hạn toàn bộ body của NGINX; API giới hạn file 8 MB. |
 | Tại sao không phải mọi POST đều retry? | Request ghi có thể đã commit trước lỗi phản hồi; chưa có idempotency key. |
 | Có thể xem HTTPS trực tiếp bằng IP không? | Cert có SAN 127.0.0.1 nhưng vẫn tự ký, nên chưa được trình duyệt tin cậy. |
+| Tại sao proxy_pass http://luma_backend; không có / ở cuối? | Nếu có `/`, NGINX cắt URI khớp `/api/` thành `/`, khiến backend Express nhận `/products` thay vì `/api/products` và trả 404. |
+| Làm sao để backend 01 nhận tải gấp đôi backend 02? | Thêm tham số `weight=2` vào `server backend1:8080 weight=2 ...;` trong khối `upstream`. |
+| Minh họa header X-Real-IP ở đâu phía backend? | Console log backend in trường `realIp` (`req.get('x-real-ip')`) và API `/api/server-info` trả về trường `xRealIp`. |
+| Tại sao chạy Docker/WSL nhưng phải sửa file hosts của Windows? | Trình duyệt chạy trên Windows host nên phân giải DNS qua file hosts của Windows (`C:\Windows\System32\drivers\etc\hosts`). |
+| Vì sao HTTPS tự ký báo Not Secure và cách sửa trên production? | Cert tự ký không thuộc Root CA Trust Store của hệ điều hành; production dùng Certbot / Let's Encrypt để lấy chứng chỉ hợp lệ. |

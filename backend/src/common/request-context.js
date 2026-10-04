@@ -12,6 +12,7 @@ export function requestContext(serverId) {
       event: 'request', serverId, requestId: req.requestId,
       method: req.method, path: req.path, status: res.statusCode,
       durationMs: Math.round(performance.now() - start),
+      realIp: req.get('x-real-ip') || null,
       forwardedFor: req.get('x-forwarded-for') || null,
       forwardedProto: req.get('x-forwarded-proto') || null,
     })));

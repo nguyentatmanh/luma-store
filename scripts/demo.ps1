@@ -45,12 +45,25 @@ switch ($Action) {
   "logs" { Run-Docker ($Compose + @("logs","-f","--tail=30","nginx","backend1","backend2")) }
   "ps" { Run-Docker ($Compose + @("ps")) }
   "cert" {
-    if (-not (Get-Command openssl -ErrorAction SilentlyContinue)) {
-      throw "Cần OpenSSL. Có thể dùng WSL: bash scripts/demo.sh cert"
+    $OpenSSL = $null
+    if (Get-Command openssl -ErrorAction SilentlyContinue) {
+      $OpenSSL = "openssl"
+    } else {
+      $candidates = @(
+        "C:\Program Files\Git\usr\bin\openssl.exe",
+        "C:\Program Files\Git\mingw64\bin\openssl.exe",
+        "C:\Program Files (x86)\Git\usr\bin\openssl.exe"
+      )
+      foreach ($cand in $candidates) {
+        if (Test-Path $cand) { $OpenSSL = $cand; break }
+      }
+    }
+    if (-not $OpenSSL) {
+      throw "Cần OpenSSL. Hãy cài OpenSSL, thêm Git usr/bin vào PATH hoặc dùng WSL: bash scripts/demo.sh cert"
     }
     if (Test-Path "certs/luma.key") { Write-Host "Cert đã có. Không ghi đè."; break }
     New-Item -ItemType Directory -Force "certs" | Out-Null
-    & openssl req -x509 -nodes -newkey rsa:2048 -keyout certs/luma.key -out certs/luma.crt -days 30 -subj "/CN=luma.test" -addext "subjectAltName=DNS:luma.test,DNS:localhost,IP:127.0.0.1"
+    & $OpenSSL req -x509 -nodes -newkey rsa:2048 -keyout certs/luma.key -out certs/luma.crt -days 30 -subj "/CN=luma.test" -addext "subjectAltName=DNS:luma.test,DNS:localhost,IP:127.0.0.1"
     if ($LASTEXITCODE -ne 0) { throw "Không tạo được chứng chỉ." }
   }
   "https" {
